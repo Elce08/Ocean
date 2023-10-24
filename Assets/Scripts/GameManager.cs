@@ -8,6 +8,7 @@ public enum Space
 {
     Air,
     Water,
+    Ground,
 }
 
 public enum OnWaterState
@@ -71,11 +72,28 @@ public class GameManager : MonoBehaviour
     private float _jumpTimeoutDelta;
     private float _fallTimeoutDelta;
 
+
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+    private PlayerInput _playerInput;
+#endif
+
     private CharacterController _controller;
     private StarterAssetsInputs _input;
     private GameObject _mainCamera;
 
     private const float _threshold = 0.01f;
+
+    private bool IsCurrentDeviceMouse
+    {
+        get
+        {
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+            return _playerInput.currentControlScheme == "KeyboardMouse";
+#else
+				return false;
+#endif
+        }
+    }
 
     private void Awake()
     {
@@ -90,6 +108,11 @@ public class GameManager : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<StarterAssetsInputs>();
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+        _playerInput = GetComponent<PlayerInput>();
+#else
+			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+#endif
 
         // timeouts 초기화
         _jumpTimeoutDelta = JumpTimeout;
@@ -121,7 +144,7 @@ public class GameManager : MonoBehaviour
         if (_input.look.sqrMagnitude >= _threshold)
         {
             //Time.deltaTime에 의한 마우스 가속 금지
-            float deltaTimeMultiplier = 1.0f;
+            float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime; 
 
             _cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
             _rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
