@@ -1,6 +1,7 @@
 using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
     [Header("플레이어 땅 체크")]
     [Tooltip("플레이어가 땅에 있는지. Not part of the CharacterController built in grounded check")]
     public bool Grounded = true;
+    [Header("플레이어 물 체크")]
+    public bool inWater = false;
     [Tooltip("거친 바닥에 유용")]
     public float GroundedOffset = -0.14f;
     [Tooltip("바닥의 각도 체크. CharacterController의 각도와 맞아야 함")]
@@ -77,6 +80,8 @@ public class GameManager : MonoBehaviour
 
     private const float _threshold = 0.01f;
 
+    Collider playerCollider;
+
     private void Awake()
     {
         // mainCamera 불러오기
@@ -84,6 +89,8 @@ public class GameManager : MonoBehaviour
         {
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         }
+        Transform child = transform.GetChild(1);
+        playerCollider = child.GetComponent<Collider>();
     }
 
     private void Start()
@@ -112,7 +119,10 @@ public class GameManager : MonoBehaviour
     {
         // set sphere position, with offset
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-        Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+        if(!inWater)
+        {
+            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+        }
     }
 
     private void CameraRotation()
@@ -153,7 +163,6 @@ public class GameManager : MonoBehaviour
 
         float speedOffset = 0.1f;
         float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
-
         // accelerate or decelerate to target speed
         if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
         {
@@ -182,53 +191,56 @@ public class GameManager : MonoBehaviour
 
         // move the player
         _controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
     }
 
     private void JumpAndGravity()
     {
-        if (Grounded)
+        if(!inWater)
         {
-            // reset the fall timeout timer
-            _fallTimeoutDelta = FallTimeout;
-
-            // stop our velocity dropping infinitely when grounded
-            if (_verticalVelocity < 0.0f)
+            if (Grounded)
             {
-                _verticalVelocity = -2f;
-            }
+                // reset the fall timeout timer
+                _fallTimeoutDelta = FallTimeout;
 
-            // Jump
-            if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                // stop our velocity dropping infinitely when grounded
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
+
+                // Jump
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                {
+                    // the square root of H * -2 * G = how much velocity needed to reach desired height
+                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                }
+
+                // jump timeout
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
+                    _jumpTimeoutDelta -= Time.deltaTime;
+                }
+            }
+            else
             {
-                // the square root of H * -2 * G = how much velocity needed to reach desired height
-                _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-            }
+                // reset the jump timeout timer
+                _jumpTimeoutDelta = JumpTimeout;
 
-            // jump timeout
-            if (_jumpTimeoutDelta >= 0.0f)
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+
+                // if we are not grounded, do not jump
+                _input.jump = false;
+            }
+            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+            if (_verticalVelocity < _terminalVelocity)
             {
-                _jumpTimeoutDelta -= Time.deltaTime;
+                _verticalVelocity += Gravity * Time.deltaTime;
             }
-        }
-        else
-        {
-            // reset the jump timeout timer
-            _jumpTimeoutDelta = JumpTimeout;
-
-            // fall timeout
-            if (_fallTimeoutDelta >= 0.0f)
-            {
-                _fallTimeoutDelta -= Time.deltaTime;
-            }
-
-            // if we are not grounded, do not jump
-            _input.jump = false;
-        }
-
-        // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-        if (_verticalVelocity < _terminalVelocity)
-        {
-            _verticalVelocity += Gravity * Time.deltaTime;
         }
     }
 
@@ -243,7 +255,21 @@ public class GameManager : MonoBehaviour
     {
         if (other.CompareTag("Water"))
         {
+            inWater = true;
+            JumpHeight = 0.4f;
+            Gravity = -0.0f;
             Debug.Log("Water");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.CompareTag("Water"))
+        {
+            inWater = false;
+            JumpHeight = 1.2f;
+            Gravity = -9.0f;
+            Debug.Log("Water Out");
         }
     }
 }
