@@ -242,6 +242,10 @@ public class GameManager : MonoBehaviour
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
         }
+        else
+        {
+            _verticalVelocity = 0.0f;
+        }
     }
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
@@ -268,7 +272,7 @@ public class GameManager : MonoBehaviour
         {
             inWater = false;
             JumpHeight = 1.2f;
-            Gravity = -9.0f;
+            Gravity = -15.0f;
             Debug.Log("Water Out");
         }
     }

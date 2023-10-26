@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 593557701}
   - component: {fileID: 593557700}
   - component: {fileID: 593557699}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain_(-1000.00, 0.00, 0.00)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -849,7 +849,7 @@ GameObject:
   - component: {fileID: 1345215835}
   - component: {fileID: 1345215834}
   - component: {fileID: 1345215833}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain_(-1000.00, 0.00, -1000.00)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -927,7 +927,7 @@ GameObject:
   - component: {fileID: 1437519265}
   - component: {fileID: 1437519264}
   - component: {fileID: 1437519263}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1070,7 +1070,7 @@ GameObject:
   - component: {fileID: 1772076160}
   - component: {fileID: 1772076159}
   - component: {fileID: 1772076158}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain_(0.00, 0.00, -1000.00)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1403,7 +1403,7 @@ PrefabInstance:
     - target: {fileID: 9005220659476430818, guid: 2d3a85ecde41a8246a79669975912b74,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 59.375
+      value: 76.875
       objectReference: {fileID: 0}
     - target: {fileID: 9005220659476430818, guid: 2d3a85ecde41a8246a79669975912b74,
         type: 3}
@@ -1500,11 +1500,12 @@ MonoBehaviour:
   JumpTimeout: 0.1
   FallTimeout: 0.15
   Grounded: 1
+  inWater: 0
   GroundedOffset: -0.14
   GroundedRadius: 0.5
   GroundLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   CinemachineCameraTarget: {fileID: 1317453877}
   TopClamp: 90
   BottomClamp: -90
@@ -1689,7 +1690,7 @@ PrefabInstance:
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 58
+      value: 75.5
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
@@ -1764,7 +1765,7 @@ PrefabInstance:
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 59.375
+      value: 76.875
       objectReference: {fileID: 0}
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81,
         type: 3}
