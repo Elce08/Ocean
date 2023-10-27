@@ -186,12 +186,12 @@ public class GameManager : MonoBehaviour
         if (_input.move != Vector2.zero)
         {
             // move
-            inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
+            if(!inWater)inputDirection = (transform.right * _input.move.x + transform.forward * _input.move.y);
+            else inputDirection = (transform.right * _input.move.x + transform.forward * _input.move.y);
         }
 
         // move the player
         _controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
     }
 
     private void JumpAndGravity()
@@ -244,7 +244,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            _verticalVelocity = 0.0f;
+            if (_input.jump)
+            {
+                _verticalVelocity = MoveSpeed;
+            }
+            else _verticalVelocity = 0.0f;
         }
     }
 
@@ -260,7 +264,7 @@ public class GameManager : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             inWater = true;
-            JumpHeight = 0.4f;
+            // JumpHeight = 0.4f;
             Gravity = -0.0f;
             Debug.Log("Water");
         }
